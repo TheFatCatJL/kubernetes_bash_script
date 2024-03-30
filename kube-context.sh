@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Some menu regex
 re_env='^[0-9]+$'
 re_confirm='^[ynYN]$'

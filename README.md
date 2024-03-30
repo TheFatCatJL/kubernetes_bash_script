@@ -3,3 +3,22 @@
 ## Bash Scripts for Kubernetes Administration Conveniences
 
 Kubernetes command line interface, kubectl, is a powerful and versatile tool for K8s administration. This repository will share some bash scripts that has integration kubectl with some common linux commands / packages.
+
+We have the following:
+
+| Script Name       | Description                                                          | Additional Package |
+| ----------------- | -------------------------------------------------------------------- | ------------------ |
+| kube-context      | A menu-based kubectl current, get & use context                      | NA                 |
+| kubelog           | A utility that search for log(s) of pods given target string (name)  | NA                 |
+
+## Use Alias for better accessibility
+
+One reason why we are scripting is to avoid excessive keystroke activities from repetitive commands.
+We should always explore using alias like the following (for bash shell):
+
+```bash
+# This is definitely one of the laziest to do aliasing - and there are better administrative ways
+# replace MY_ALIAS_COMMAND_NAME with your desired command name that you want to invoke your target bash script
+# replace /<FULL_PATH_TO_TARGET_BASH_SCRIPT> with the actual FULL PATH
+echo "alias MY_ALIAS_COMMAND_NAME='bash /<FULL_PATH_TO_TARGET_BASH_SCRIPT>" >> ~/.bashrc
+```
