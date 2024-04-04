@@ -1,20 +1,21 @@
 #!/usr/bin/env bash
 
-# This arg will check for the keyword that is used for searching POD NAME
+# Grep keyword for searching POD NAME
+# note case-insensitive
 grepword=$1
 
 # This arg will limit the return of results of the logs of 
 # pods that matches the POD NAME using the above keyword
-# Default will only return 1 result (the first 10 search)
+# Default will only return 10 result (the first 10 search)
 log_limit=${2-10}
 
 # This will restrict the namespace that the search will be confined to if given
-# This arg is more like a limiter for search (migh as well just kubectl)
+# This arg is more like a limiter for search (might as well just kubectl... ?)
 nscheck=${3-'EMPTY'}
 
 kubelog-all() {
     log_num=0
-    kubectl get pods --no-headers -o custom-columns=":metadata.name,:metadata.namespace" -A | grep $grepword | \
+    kubectl get pods --no-headers -o custom-columns=":metadata.name,:metadata.namespace" -A | grep -i -E $grepword | \
     while read -a list
     do 
         echo
@@ -30,7 +31,7 @@ kubelog-all() {
 
 kubelog-ns() {
     log_num=0
-    kubectl get pods --no-headers -o custom-columns=":metadata.name,:metadata.namespace" -n $nscheck | grep $grepword | \
+    kubectl get pods --no-headers -o custom-columns=":metadata.name,:metadata.namespace" -n $nscheck | grep -i -E $grepword | \
     while read -a list
     do 
         echo
