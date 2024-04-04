@@ -3,17 +3,18 @@
 ## Bash Scripts for Kubernetes Administration Conveniences
 
 Kubernetes command line interface, kubectl, is a powerful and versatile tool for K8s administration.  
-This repository will share some bash scripts that has integration kubectl with some common linux commands / packages.
+This repository will share some bash scripts that has integrated kubectl with some common linux commands / packages.
 
 We have the following:
 
 | Script Name       | Description                                                          | Additional Package |
 | ----------------- | -------------------------------------------------------------------- | ------------------ |
 | kube-context      | A menu-based kubectl current, get & use context                      | NA                 |
-| kubelog           | Output log(s) of pod(s) given search string (name)                   | NA                 |
-| kubedesc          | Describe resource(s) given search string (name)                      | NA                 |
-| kubeall           | Similiar to kubectl get all -A just with grep search built in        | NA                 |
-| kubeclean         | Simple dangling pod and rs "cleaner" (spot and preemptibles..)       | NA                 |
+| kube-log          | Output log(s) of pod(s) given search string (name)                   | NA                 |
+| kube-desc         | Describe resource(s) given search string (name)                      | NA                 |
+| kube-get-all      | Similiar to kubectl get all -A just with grep search built in        | NA                 |
+| kube-clean        | Simple dangling pod and rs "cleaner" (spot and preemptibles..)       | NA                 |
+| kube-restart      | Menu based kubectl rollout restart RESOURCE for entire namespace     | NA                 |
 
 ## Use Alias for better accessibility
 

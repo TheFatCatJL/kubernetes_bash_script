@@ -16,6 +16,12 @@ nscheck=${3-'EMPTY'}
 
 flag=A
 
+if [ ! "$grepword" ]; then
+    echo "We need a search string... Try again"
+    echo "EXAMPLE >>> ./kube-get-all.sh <search-string>"
+    exit 1
+fi
+
 if [ "$nscheck" == "EMPTY" ]; then
     echo "Getting resources across all namespaces..."
 else

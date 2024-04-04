@@ -45,6 +45,12 @@ kubelog-ns() {
     done
 }
 
+if [ ! "$grepword" ]; then
+    echo "We need a search string... Try again"
+    echo "EXAMPLE >>> ./kube-log.sh <search-string>"
+    exit 1
+fi
+
 echo "Limiting to only first $log_limit logs..."
 if [ "$nscheck" == "EMPTY" ]; then
     echo "Searching for logs across all namespaces..."

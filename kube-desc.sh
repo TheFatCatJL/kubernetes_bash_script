@@ -37,6 +37,11 @@ kube_get_describe() {
     done
 }
 
+if [ ! "$grepword" ]; then
+    echo "We need a search string... Try again"
+    echo "EXAMPLE >>> ./kube-desc.sh <search-string>"
+    exit 1
+fi
 
 if [ "$nscheck" == "EMPTY" ]; then
     echo "Searching for resource descriptions across all namespaces..."
