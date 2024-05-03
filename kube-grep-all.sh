@@ -5,9 +5,8 @@
 grepword=$1
 
 # By default without a second arg this will work because 
-# we will get all the common resources that matches the name search
-# common - pod,svc,deploy,rs,daemonset,ss,cm,secret,ing
-# user can provide args like secrets,cm,ing
+# we will get all the resources that matches the grep search
+# user can provide args like secrets,cm,ing to limit the resource scope
 kind=${2-'ALL'}
 
 # This will restrict the namespace that the search will be confined to if given
@@ -16,9 +15,16 @@ nscheck=${3-'EMPTY'}
 
 flag=A
 
+kube-grep-every-kind() {
+    kubectl api-resources --verbs=list --namespaced -o name | \
+    xargs -n 1 kubectl get --ignore-not-found --show-kind -$flag | \
+    grep -i -E $grepword | \
+    column -t
+}
+
 if [ ! "$grepword" ]; then
     echo "We need a search string... Try again"
-    echo "EXAMPLE >>> ./kube-get-all.sh <search-string>"
+    echo "EXAMPLE >>> ./kube-grep-all.sh <search-string>"
     exit 1
 fi
 
@@ -30,10 +36,9 @@ else
 fi
 
 if [ "$kind" == "ALL" ]; then
-    echo "Targeting ALL common resources : pod,svc,deploy,rs,daemonset,ss,cm,secrets,ing..."
-    kind=all,cm,secret,ing
+    echo "Targeting ALL resources"
+    kube-grep-every-kind
 else
     echo "Targeting resources : $kind..."
+    kubectl get $kind -$flag | grep -i -E $grepword | column -t
 fi
-
-kubectl get $kind -$flag | grep -i -E $grepword | column -t

@@ -12,7 +12,7 @@ We have the following:
 | kube-context      | A menu-based kubectl current, get & use context                      | NA                 |
 | kube-log          | Output log(s) of pod(s) given search string (name)                   | NA                 |
 | kube-desc         | Describe resource(s) given search string (name)                      | NA                 |
-| kube-get-all      | Similiar to kubectl get all -A just with grep search built in        | NA                 |
+| kube-grep-all     | Similiar to kubectl get all -A just with grep search built in        | NA                 |
 | kube-clean        | Simple dangling pod and rs "cleaner" (spot and preemptibles..)       | NA                 |
 | kube-restart      | Menu based kubectl rollout restart RESOURCE for entire namespace     | NA                 |
 
