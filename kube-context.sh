@@ -4,6 +4,32 @@
 re_env='^[0-9]+$'
 re_confirm='^[ynYN]$'
 
+# Usage
+usage (){
+cat << EOF
+usage   : kube-context [-h]
+example : ./kube-context.sh     (follow the menu)
+
+-h                 Display usage
+
+EOF
+}
+
+# getopts
+while getopts ":h" opt; do
+  case ${opt} in
+    h)
+      usage
+      exit 0
+      ;;
+    \?)
+      usage
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
 # Print the context menu for user choice
 print_context_choice_menu() {
     correct_choice=0
@@ -11,7 +37,7 @@ print_context_choice_menu() {
     while [ $correct_choice == 0 ]
     do
         printf "\n%s\n" "Current context is: $(kubectl config current-context)
-You have the following context available:
+You have the following context available in your .kube/config:
 "
         context_num=0
         for context in ${contexts[@]}; do

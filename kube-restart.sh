@@ -1,5 +1,33 @@
 #!/usr/bin/env bash
 
+# This small utility is for perform kubectl restart using a simple console menu
+
+# Usage
+usage (){
+cat << EOF
+usage   : kube-restart [-h]
+example : ./kube-restart.sh     (follow the menu)
+
+-h                 Display usage
+
+EOF
+}
+
+# getopts
+while getopts ":h" opt; do
+  case ${opt} in
+    h)
+      usage
+      exit 0
+      ;;
+    \?)
+      usage
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
 # Some menu regex
 re_env='^[0-9]+$'
 re_confirm='^[ynYN]$' 
@@ -9,12 +37,14 @@ resource_choice='ALL'
 ns_choice='default'
 
 print_preface_menu() {
-printf "%s\n" "
+cat << EOF
+
 This utility is used to perform the following:
 kubectl rollout restart 
 on deployments, daemonset, statefulset
-on entire namespace.
-"
+in the target namespace.
+
+EOF
 }
 
 print_namespace_choice_menu() {
@@ -81,6 +111,7 @@ kube_ns=$(kubectl get namespace -no-headers -o custom-columns=":metadata.name" |
 IFS=$'\n' read -r -d '' -a namespaces <<EOF
 ${kube_ns}
 EOF
+print_preface_menu
 print_namespace_choice_menu
 print_resource_choice_menu
 

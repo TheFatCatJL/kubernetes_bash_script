@@ -8,20 +8,26 @@
 # Add on if you have other status for pod cleaning
 podStatusArray=("Error" "NodeAffinity" "CrashLoop" "Evicted")
 
+# Usage
 usage (){
 cat << EOF
 usage: kube-clean [-n <namespace>] [-f] [-h]
+example : ./kube-clean.sh => perform kubectl delete on all empty and dead po 
+          ./kube-clean.sh -n <namespace> => perform kubectl delete on all empty and dead po in the target namespace
+
 -n <namespace>     Limits the deleting of replicasets and pods to the target namespace
+                   Default - ALL namespaces
 -f                 Force delete - same as kubectl delete <kind> --force
 -h                 Display usage
+
 EOF
 }
 
-kubeclean() {
-    if [ -z ${nscheck} ]; then
+run-main() {
+    if [ -z ${namespace} ]; then
         flag=A
     else
-        flag=$(echo "n $nscheck")
+        flag=$(echo "n $namespace")
     fi
 
     # First we get rid of unused replicaset
@@ -47,7 +53,7 @@ kubeclean() {
 while getopts ":n::fh" opt; do
   case ${opt} in
     n)
-      nscheck=${OPTARG}
+      namespace=${OPTARG}
       ;;
     f)
       forceflag="--force"
@@ -64,4 +70,4 @@ while getopts ":n::fh" opt; do
 done
 shift $((OPTIND-1))
 
-kubeclean
+run-main

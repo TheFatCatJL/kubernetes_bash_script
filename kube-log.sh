@@ -1,17 +1,24 @@
 #!/usr/bin/env bash
 
-# Grep keyword for searching POD NAME
-# note case-insensitive
-grepword=$1
+# This small utility is for perform kubectl get po | grep | kubectl log in sucession
+# Useful for debugging siutations where you know you apparently know the resource names (not the random part).
 
-# This arg will limit the return of results of the logs of 
-# pods that matches the POD NAME using the above keyword
-# Default will only return 10 result (the first 10 search)
-log_limit=${2-10}
+# Usage
+usage (){
+cat << EOF
+usage   : kube-log -g <grepword> [-n <namespace>] [-l <limit>] [-h]
+example : ./kube-log.sh -g <resource_name>  => return kubectl log of pod(s) with this name
+          ./kube-log.sh -g <resource_name>  -n <namespace> => return kubectl log of pod(s) with this name in the target namespace
 
-# This will restrict the namespace that the search will be confined to if given
-# This arg is more like a limiter for search (might as well just kubectl... ?)
-nscheck=${3-'EMPTY'}
+-g <grepword>      This is a mandatory string to perform grep search
+-n <namespace>     Limits searching of resources only to the target namespace
+                   Default - ALL namespaces
+-l <limit>         This impose a limit on the number of results (due to how extensive is each kubectl describe)
+                   Deafult - limits result displayed up to 1
+-h                 Display usage
+
+EOF
+}
 
 kubelog-all() {
     log_num=0
@@ -31,7 +38,7 @@ kubelog-all() {
 
 kubelog-ns() {
     log_num=0
-    kubectl get pods --no-headers -o custom-columns=":metadata.name,:metadata.namespace" -n $nscheck | grep -i -E $grepword | \
+    kubectl get pods --no-headers -o custom-columns=":metadata.name,:metadata.namespace" -n $namespace | grep -i -E $grepword | \
     while read -a list
     do 
         echo
@@ -45,17 +52,43 @@ kubelog-ns() {
     done
 }
 
+run-main(){
+    if [ -z ${namespace} ]; then
+        echo "Searching for logs across all namespaces..."
+        kubelog-all
+    else
+        echo "Searching for logs across $namespace namespace..."
+        kubelog-ns
+    fi
+}
+
+# getopts
+while getopts ":g:n::k::l::h" opt; do
+  case ${opt} in
+    g)
+      grepword=${OPTARG}
+      ;;
+    n)
+      namespace=${OPTARG}
+      ;;
+    l)
+      log_limit=${OPTARG}
+      ;;
+    h)
+      usage
+      exit 0
+      ;;
+    \?)
+      usage
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
 if [ ! "$grepword" ]; then
-    echo "We need a search string... Try again"
-    echo "EXAMPLE >>> ./kube-log.sh <search-string>"
+    usage
     exit 1
 fi
 
-echo "Limiting to only first $log_limit logs..."
-if [ "$nscheck" == "EMPTY" ]; then
-    echo "Searching for logs across all namespaces..."
-    kubelog-all
-else
-    echo "Searching for logs across $nscheck namespace..."
-    kubelog-ns
-fi
+run-main
