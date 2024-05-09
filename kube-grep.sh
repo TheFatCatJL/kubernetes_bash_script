@@ -20,35 +20,48 @@ example : ./kube-grep.sh -g <resource_name>  => return all resources with this n
 EOF
 }
 
+kube-grep-total() {
+  kubectl api-resources --verbs=list --namespaced -o name | \
+  xargs -n 1 kubectl get --ignore-not-found --show-kind -$flag
+  exit 0
+}
+
 kube-grep-every-kind() {
-    kubectl api-resources --verbs=list --namespaced -o name | \
-    xargs -n 1 kubectl get --ignore-not-found --show-kind -$flag | \
-    grep -i -E $grepword | \
-    column -t
+  kubectl api-resources --verbs=list --namespaced -o name | \
+  xargs -n 1 kubectl get --ignore-not-found --show-kind -$flag | \
+  grep -i -E $grepword | \
+  column -t
+  exit 0
 }
 
 kube-grep-specified-kind() {
-    kubectl get $kind -$flag | \
-    grep -i -E $grepword | \
-    column -t
+  kubectl get $kind -$flag | \
+  grep -i -E $grepword | \
+  column -t
+  exit 0
 }
 
 run-main(){
-    if [ -z ${namespace} ]; then
-        echo "Getting resources across all namespaces..."
-        flag=A
-    else
-        echo "Getting resources across $namespace namespace..."
-        flag=$(echo "n $namespace")
-    fi
+  if [[ "${grepword}" == "ADMIN_SNAPSHOT" ]]; then
+    flag=A
+    kube-grep-total
+  fi
 
-    if [ -z ${kind} ]; then
-        echo "Targeting ALL resources"
-        kube-grep-every-kind
-    else
-        echo "Targeting resources : $kind..."
-        kube-grep-specified-kind
-    fi
+  if [ -z ${namespace} ]; then
+    echo "Getting resources across all namespaces..."
+    flag=A
+  else
+    echo "Getting resources across $namespace namespace..."
+    flag=$(echo "n $namespace")
+  fi
+
+  if [ -z ${kind} ]; then
+    echo "Targeting ALL resources"
+    kube-grep-every-kind
+  else
+    echo "Targeting resources : $kind..."
+    kube-grep-specified-kind
+  fi
 }
 
 # getopts

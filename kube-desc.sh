@@ -24,54 +24,54 @@ EOF
 }
 
 kube-desc-every-kind() {
-    kubectl api-resources --verbs=list --namespaced -o name  | \
-    xargs -n 1 kubectl get --ignore-not-found --show-kind -$flag -o custom-columns=":metadata.namespace,:metadata.name,:kind" | \
-    grep -i -E $grepword | \
-    while read -a list
-    do 
-        echo
-        echo "############### KUBECTL DESCRIBE (${list[2]}) - ${list[1]} : ${list[0]} ###############"
-        echo
-        kubectl describe ${list[2]} ${list[1]} -n ${list[0]};
-        desc_num=$((desc_num+=1))
-        if [ $desc_num -ge $desc_limit ]; then
-            exit 0
-        fi
-    done
+  kubectl api-resources --verbs=list --namespaced -o name  | \
+  xargs -n 1 kubectl get --ignore-not-found --show-kind -$flag -o custom-columns=":metadata.namespace,:metadata.name,:kind" | \
+  grep -i -E $grepword | \
+  while read -a list
+  do 
+    echo
+    echo "############### KUBECTL DESCRIBE (Kind: ${list[2]} Name: ${list[1]}) NS: ${list[0]} ###############"
+    echo
+    kubectl describe ${list[2]} ${list[1]} -n ${list[0]};
+    desc_num=$((desc_num+=1))
+    if [[ $desc_num -ge $desc_limit ]]; then
+      exit 0
+    fi
+  done
 }
 
 kube-desc-specified-kind() {
-    kubectl get $kind -$flag --ignore-not-found --show-kind -o custom-columns=":metadata.namespace,:metadata.name,:kind"  | \
-    grep -i -E $grepword | \
-    while read -a list
-    do 
-        echo
-        echo "############### KUBECTL DESCRIBE (${list[2]}) - ${list[1]} : ${list[0]} ###############"
-        echo
-        kubectl describe ${list[2]} ${list[1]} -n ${list[0]};
-        desc_num=$((desc_num+=1))
-        if [ $desc_num -ge $desc_limit ]; then
-            exit 0
-        fi
-    done
+  kubectl get $kind -$flag --ignore-not-found --show-kind -o custom-columns=":metadata.namespace,:metadata.name,:kind"  | \
+  grep -i -E $grepword | \
+  while read -a list
+  do 
+    echo
+    echo "############### KUBECTL DESCRIBE (Kind: ${list[2]} Name: ${list[1]}) NS: ${list[0]} ###############"
+    echo
+    kubectl describe ${list[2]} ${list[1]} -n ${list[0]};
+    desc_num=$((desc_num+=1))
+    if [[ $desc_num -ge $desc_limit ]]; then
+      exit 0
+    fi
+  done
 }
 
 run-main(){
-    if [ -z ${namespace} ]; then
-        echo "Searching for resource descriptions across all namespaces..."
-        flag=A
-    else
-        echo "Searching for resource descriptions across $namespace namespace..."
-        flag=$(echo "n $namespace")
-    fi
+  if [ -z ${namespace} ]; then
+    echo "Searching for resource descriptions across all namespaces..."
+    flag=A
+  else
+    echo "Searching for resource descriptions across $namespace namespace..."
+    flag=$(echo "n $namespace")
+  fi
 
-    if [ -z ${kind} ]; then
-        echo "Targeting ALL resources"
-        kube-desc-every-kind
-    else
-        echo "Targeting resources : $kind..."
-        kube-desc-specified-kind
-    fi
+  if [ -z ${kind} ]; then
+    echo "Targeting ALL resources"
+    kube-desc-every-kind
+  else
+    echo "Targeting resources : $kind..."
+    kube-desc-specified-kind
+  fi
 }
 
 # getopts
@@ -102,8 +102,12 @@ done
 shift $((OPTIND-1))
 
 if [ ! "$grepword" ]; then
-    usage
-    exit 1
+  usage
+  exit 1
+fi
+
+if [ ! "$desc_limit" ]; then
+  desc_limit=10
 fi
 
 run-main
